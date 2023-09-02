@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Export generator="IRIS" version="26">
+
+<Class name="pkg1.a">
+</Class>
+
+<Class name="pkg1.b">
+</Class>
+
+<Class name="pkg1.c">
+</Class>
+
+<Class name="pkg2.a">
+</Class>
+
+<Class name="pkg2.b">
+</Class>
+
+<Class name="pkg2.c">
+</Class>
+
+<Routine name="Strix" type="INC"><![CDATA[
+#include %occInclude
+]]></Routine>
+
+</Export>
