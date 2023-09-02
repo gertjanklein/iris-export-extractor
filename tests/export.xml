@@ -19,7 +19,11 @@
 <Class name="pkg2.c">
 </Class>
 
-<Routine name="Strix" type="INC"><![CDATA[
+<Routine name="pkg1.a" type="INC"><![CDATA[
+#include %occInclude
+]]></Routine>
+
+<Routine name="pkg2.a" type="INC"><![CDATA[
 #include %occInclude
 ]]></Routine>
 
