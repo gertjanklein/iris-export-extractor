@@ -91,3 +91,17 @@ def test_routine_all(run, tmp_path):
     
     src = [ i for i in 'pkg1.a.inc,pkg2.a.inc'.split(',')]
     assert dst == src, "Expected all routines in output file"
+
+
+def test_multiple_specs(run, tmp_path):
+    """Test extracting multiple specified items"""
+    
+    take = ['pkg1.a.cls', 'pkg2.b.cls', 'pkg1.a.inc']
+    output = run(take, tmp_path)
+    assert output.exists(), f"Expected {output} to exist"
+    
+    outroot = etree.parse(output).getroot()
+    dst = [ extract.determine_item_name(item) for item in outroot ]
+    
+    assert dst == take, "Expected all routines in output file"
+
