@@ -3,6 +3,9 @@ import argparse
 import re
 from pathlib import Path
 
+import logging
+from logging import debug, info, warning
+
 from lxml import etree
 
 
@@ -29,21 +32,26 @@ def main(args:argparse.Namespace):
     
     # Loop through items in input file, add to output if needed
     for item in inroot:
-        if not include(item, take, skip):
+        # Get the name as used in the take/skip specs
+        name = determine_item_name(item)
+    
+        if not include(name, take, skip):
+            debug(f"Skipping {name}")
             continue
+        
+        debug(f"Adding {name}")
         outroot.append(item)
         item.tail = '\n\n'
     
     # Create an ElementTree for the output, and use it to write the file
     outtree = etree.ElementTree(outroot)
     outtree.write(args.outfile, with_tail=True, xml_declaration=True, encoding='UTF-8')
-
-
-def include(item, take, skip) -> bool:
-    """Determine whether to include this item"""
     
-    # Get the name as used in the take/skip specs
-    itemname = determine_item_name(item)
+    info(f"Done; added {len(outroot)} items to {args.outfile}.")
+
+
+def include(itemname:str, take, skip) -> bool:
+    """Determine whether to include this item"""
     
     # Process skip list first, then take
     for lst, rv in (skip, False), (take, True):
@@ -70,7 +78,7 @@ def determine_item_name(item) -> str:
     elif tag == 'Routine':
         itemtype = str(item.attrib['type']).lower()
     else:
-        print(f"Warning: skipping element {tag}, don't know how to handle it")
+        warning(f"Warning: skipping element {tag}, don't know how to handle it")
         return ''
     
     return f"{name}.{itemtype}"
@@ -94,6 +102,10 @@ def parse_specs(args:argparse.Namespace):
 
 
 def read_spec_file(specfile:Path, take, skip):
+    """Reads spec file, handles each line as a spec"""
+    
+    debug("Reading item specifications from {spec[1:]}")
+    
     if not specfile.exists():
         return error(2, f"Spec file '{specfile}' does not exist")
     
@@ -128,7 +140,7 @@ def check_single_spec(spec, take, skip):
     
 
 def error(exitcode:int, msg:str):
-    print(msg, file=sys.stderr)
+    logging.error(msg)
     sys.exit(exitcode)
 
 
@@ -136,6 +148,8 @@ def setup_argparse():
     """Set up the argparse argument parser"""
     
     parser = argparse.ArgumentParser()
+    levels = ('debug', 'info', 'warning', 'error', 'critical')
+    parser.add_argument('--log-level', default='info', choices=levels)
     parser.add_argument("infile", type=argparse.FileType('rb'),
        help="The name of the input file, containing the export"
             " to extract from")
@@ -147,7 +161,13 @@ def setup_argparse():
     return parser
 
 
+def setup_logging(args):
+    logging.basicConfig(level=args.log_level.upper(),
+        format='%(message)s')
+
+
 if __name__ == '__main__':
     parser = setup_argparse()
     args = parser.parse_args()
+    setup_logging(args)
     main(args)

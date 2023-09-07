@@ -20,6 +20,10 @@ def run():
         ns.outfile = str(output)
         ns.items = specs
         
+        # Make sure logging is initialized
+        ns.log_level = 'error'
+        extract.setup_logging(ns)
+        
         extract.main(ns)
         
         return output
