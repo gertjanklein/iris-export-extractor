@@ -1,3 +1,5 @@
+![Tests](https://github.com/gertjanklein/iris-export-extractor/actions/workflows/run-pytest.yml/badge.svg)
+
 # IRIS export extractor
 
 This script extracts items from an InterSystems
