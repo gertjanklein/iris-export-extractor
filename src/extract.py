@@ -45,19 +45,17 @@ def include(item, take, skip) -> bool:
     # Get the name as used in the take/skip specs
     itemname = determine_item_name(item)
     
-    # First process the skip specs
-    for spec in skip:
-        if isinstance(spec, str):
-            return spec != itemname
-        else:
-            return not spec.match(itemname)
-    
-    # Now process take specs
-    for spec in take:
-        if isinstance(spec, str):
-            return spec == itemname
-        else:
-            return spec.match(itemname)
+    # Process skip list first, then take
+    for lst, rv in (skip, False), (take, True):
+        for spec in lst:
+            if isinstance(spec, str):
+                if spec != itemname:
+                    continue
+                return rv
+            else:
+                if not spec.match(itemname):
+                    continue
+                return rv
     
     return False
 
